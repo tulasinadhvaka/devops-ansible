@@ -1,0 +1,17 @@
+    - name: Stopping tomcat
+      service: name=tomcat state=stopped
+
+    - name: Create testzip dir
+      file: path=/opt/tomcat/webapps/testzip state=directory
+    
+    - name: copy test.zip to server
+      copy: src=../deploy/test.zip dest=/tmp
+
+    - name: copy test.zip to server
+      unarchive: src=/tmp/test.zip dest=/opt/tomcat/webapps/testzip/ remote_src=yes
+
+    - name: set permissions on testzip
+      file: path=/opt/tomcat/webapps/testzip state=directory owner=tomcat group=tomcat mode=740
+
+    - name: Starting tomcat
+      service: name=tomcat state=started

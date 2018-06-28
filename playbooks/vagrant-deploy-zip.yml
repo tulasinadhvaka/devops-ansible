@@ -1,0 +1,7 @@
+---
+- hosts: app1
+  remote_user: vagrant
+  sudo: yes     
+
+  tasks:
+    - include: deploy-zip-tasks.yml

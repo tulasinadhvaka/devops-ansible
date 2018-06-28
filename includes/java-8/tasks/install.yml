@@ -1,0 +1,6 @@
+---
+- name: Download Java 1.8
+  get_url: url=https://s3-us-west-2.amazonaws.com/com.tyfone.jdk/jdk-8u141-linux-x64.rpm dest=/opt/jdk-8u141-linux-x64.rpm 
+
+- name: Install Java 1.8
+  command: rpm -ivh /opt/jdk-8u141-linux-x64.rpm creates=/usr/bin/java

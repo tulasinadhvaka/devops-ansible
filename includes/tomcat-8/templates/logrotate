@@ -1,0 +1,10 @@
+/opt/{{tomcat_instance.name}}/logs/catalina.out {
+    dateext
+    dateformat %Y-%m-%d.
+    extension out
+    copytruncate
+    daily
+    rotate 30
+    compress
+    missingok
+}

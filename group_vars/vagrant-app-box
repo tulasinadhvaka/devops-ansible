@@ -1,0 +1,13 @@
+# vagrant MCB App Servers Installation Variables
+
+environment_name: vagrant
+
+tomcat_instances:
+  - name: "tomcat"  
+    java_opts: "-Xms256m -Xmx512m" 
+    server_port: 8005
+    http_port: 8080
+    https_port: 8443
+    ajp_port: 8009
+  
+

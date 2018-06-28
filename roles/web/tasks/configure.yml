@@ -1,0 +1,27 @@
+- name: Configure Apache
+  template: src=httpd.conf dest=/etc/httpd/conf/httpd.conf
+
+- name: Configure Apache
+  template: src=ssl.conf dest=/etc/httpd/conf.d/ssl.conf
+# web
+- block:
+  - name: Install key for {{vhost_web_name}}
+    copy: src=./{{vhost_web_key_path}}/{{vhost_web_key_file}} dest=/etc/httpd/conf/ssl/ owner=root group=apache mode=0750
+
+  - name: Install cert for {{vhost_web_name}}
+    copy: src=./{{vhost_web_cert_path}}/{{vhost_web_cert_file}} dest=/etc/httpd/conf/ssl/ owner=root group=apache mode=0755
+
+  - name: Copy web.conf vhost configuration
+    template: src=web.conf dest=/etc/httpd/conf.d/
+
+  - name: Create docroot folder for {{vhost_web_name}}
+    file: path=/var/www/{{vhost_web_name}} state=directory owner=root group=apache mode=750
+
+  - name: Install landing page for {{vhost_web_name}}
+    template: src=index.html dest=/var/www/{{vhost_web_name}}/index.html
+
+- name: Start Apache
+  service: name=httpd state=restarted enabled=yes
+
+- name: wait for apache to start
+  wait_for: port={{http_port}}

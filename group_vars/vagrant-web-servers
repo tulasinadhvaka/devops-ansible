@@ -1,0 +1,20 @@
+environment_name: vagrant
+iptables_enabled: true
+selinux_enabled: no
+
+http_port: 80
+https_port: 443
+
+# Here are variables related to the Tomcat installation
+
+# app1  
+tomcat_app1_ip: 10.0.0.110
+tomcat_app1_http_port: 8080
+tomcat_app1_ajp_port: 8009
+
+vhost_web_name: vagrant.web.com
+vhost_web_http_port: 80
+vhost_web_https_port: 443
+vhost_web_key_file:  opessl-key.pem
+vhost_web_key_path: ssl_keys
+vhost_web_cert_file: openssl-csr.crt

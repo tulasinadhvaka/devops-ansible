@@ -1,0 +1,52 @@
+---
+- name: Download Tomcat
+  get_url: url=https://s3-us-west-2.amazonaws.com/com.tyfone.jdk/tomcat/apache-tomcat-8.0.47.tar.gz dest=/opt/apache-tomcat-8.0.47.tar.gz 
+
+- name: Extract archive
+  command: chdir=/opt /bin/tar xvf /opt/apache-tomcat-8.0.47.tar.gz -C /opt/ creates=/opt/apache-tomcat-8.0.47
+
+- name: create backup directory
+  file: path=/data/backup/{{tomcat_instance.name}}_backup state=directory
+
+- name: Stat to check the dir
+  stat: path=/opt/{{tomcat_instance.name}}  
+  register: tomcat
+
+- name: Stat to check the tomcat_backup
+  stat: path=/data/backup/{{tomcat_instance.name}}_backup
+  register: tomcat_backup
+
+- block: 
+    - name: Stop {{tomcat_instance.name}}
+      service: name={{tomcat_instance.name}} state=stopped  
+
+    - name: take backup of {{tomcat_instance.name}}
+      shell: mv  /opt/{{tomcat_instance.name}}/* /data/backup/{{tomcat_instance.name}}_backup/
+
+    - name: Remove existing {{tomcat_instance.name}}  directory
+      file: path=/opt/{{tomcat_instance.name}} state=absent
+      when: tomcat_backup.stat.exists
+
+    - name: Rename Tomcat directory to {{tomcat_instance.name}}
+      command: chdir=/opt mv apache-tomcat-8.0.47 {{tomcat_instance.name}} creates=/opt/{{tomcat_instance.name}}
+      when: tomcat_backup.stat.exists
+
+    - name: delete new webapps
+      shell: rm -rf /opt/{{tomcat_instance.name}}/webapps
+      when: tomcat_backup.stat.exists
+
+    - name: replace backup of {{tomcat_instance.name}} webapps
+      shell: mv /data/backup/{{tomcat_instance.name}}_backup/webapps /opt/{{tomcat_instance.name}}/
+
+    - name: delete new logs
+      shell: rm -rf /opt/{{tomcat_instance.name}}/logs
+
+    - name: replace backup of {{tomcat_instance.name}}  logs
+      shell: mv /data/backup/{{tomcat_instance.name}}_backup/logs /opt/{{tomcat_instance.name}}/
+
+    - name: Change ownership of {{tomcat_instance.name}} installation
+      file: path=/opt/{{tomcat_instance.name}}/ owner=tomcat group=tomcat state=directory recurse=yes
+
+    - name: Install catalina.properties
+      copy: src=../includes/tomcat-8/files/tomcat8047_catalina.properties dest=/opt/{{tomcat_instance.name}}/conf/catalina.properties owner=tomcat group=tomcat mode=0600
+  when: tomcat.stat.exists

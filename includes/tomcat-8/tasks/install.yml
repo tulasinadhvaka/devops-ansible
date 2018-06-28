@@ -1,0 +1,28 @@
+---
+# Ensure Java 8 is installed.
+- include: includes/java-8/tasks/install.yml 
+
+- name: add group "tomcat"
+  group: name=tomcat
+
+- name: add user "tomcat"
+  user: name=tomcat group=tomcat createhome=no
+  sudo: True
+
+- name: Download Tomcat
+  get_url: url=https://s3-us-west-2.amazonaws.com/com.tyfone.jdk/tomcat/apache-tomcat-8.0.45.tar.gz dest=/opt/apache-tomcat-8.0.45.tar.gz
+
+- name: Extract archive
+  command: chdir=/opt /bin/tar xvf /opt/apache-tomcat-8.0.45.tar.gz -C /opt/ creates=/opt/apache-tomcat-8.0.45
+
+- name: Rename Tomcat directory
+  command: chdir=/opt mv apache-tomcat-8.0.45 {{tomcat_instance.name}} creates=/opt/{{tomcat_instance.name}}
+
+- name: Change ownership of Tomcat installation
+  file: path=/opt/{{tomcat_instance.name}} owner=tomcat group=tomcat state=directory recurse=yes
+  
+- name: Install Tomcat init script
+  template: src=includes/tomcat-8/templates/tomcat-initscript.sh dest=/etc/init.d/{{tomcat_instance.name}} mode=0755
+
+- name: Install catalina.properties
+  copy: src=includes/tomcat-8/files/catalina.properties dest=/opt/{{tomcat_instance.name}}/conf/ owner=tomcat group=tomcat mode=0600

@@ -1,0 +1,6 @@
+---
+# Install Tomcat Instance(s)
+- include: install.yml
+  vars:
+    tomcat_instance: "{{item}}"
+  with_items: "{{tomcat_instances}}"

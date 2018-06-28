@@ -1,0 +1,14 @@
+---
+- hosts: web
+  user: vagrant
+  become: yes
+  roles:
+    - selinux
+    - web
+
+- hosts: app1
+  user: vagrant
+  become: yes
+  roles:
+    - selinux
+    - app

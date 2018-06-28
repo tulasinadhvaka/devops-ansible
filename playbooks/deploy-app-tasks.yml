@@ -1,0 +1,23 @@
+    - name: Stopping tomcat
+      service: name=tomcat state=stopped
+
+    - name: Stat to check the dir
+      stat: path=/opt/tomcat/webapps/test-app
+      register: testapp
+
+    - name: Delete test-app.war
+      file: path=/opt/tomcat/webapps/test-app.war state=absent
+      when: testapp.stat.exists
+
+    - name: Delete test-app directory
+      file: path=/opt/tomcat/webapps/test-app state=absent
+      when: testapp.stat.exists
+
+    - name: copy test-app.war to server
+      copy: src=../deploy/test-app.war dest=/opt/tomcat/webapps/
+
+    - name: set permissions on test-app.war
+      file: path=/opt/tomcat/webapps/test-app.war state=file owner=tomcat group=tomcat mode=740
+
+    - name: Starting tomcat
+      service: name=tomcat state=started

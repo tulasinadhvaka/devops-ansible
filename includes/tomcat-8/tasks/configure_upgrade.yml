@@ -1,0 +1,35 @@
+---
+
+- name: Install setenv.sh
+  template: src=../includes/tomcat-8/templates/setenv.sh dest=/opt/{{tomcat_instance.name}}/bin/ owner=tomcat group=tomcat mode=0750
+ 
+- name: Install server.xml
+  template: src=../{{tomcat_instance.server_xml}} dest=/opt/{{tomcat_instance.name}}/conf/server.xml owner=tomcat group=tomcat mode=0600
+
+- name: Install logging.properties
+  copy: src=../includes/tomcat-8/files/logging.properties dest=/opt/{{tomcat_instance.name}}/conf/ owner=tomcat group=tomcat mode=0600
+  
+- name: Install log rotator
+  template: src=../includes/tomcat-8/templates/logrotate dest=/etc/logrotate.d/{{tomcat_instance.name}} owner=tomcat group=tomcat mode=0600
+  
+# iptables cruft
+# - name: iptables accept tomcat http port
+#   iptables: chain=INPUT protocol=tcp destination_port={{tomcat_http_port}} jump=ACCEPT state=present
+#   sudo: True
+# - name: iptables accept tomcat https port
+#   iptables: chain=INPUT protocol=tcp destination_port={{tomcat_https_port}} jump=ACCEPT state=present
+#   sudo: True
+# - name: iptables accept tomcat ajp port
+#   iptables: chain=INPUT protocol=tcp destination_port={{tomcat_ajp_port}} jump=ACCEPT state=present
+#   sudo: True
+# - name: iptables save
+#   command: service iptables save
+#   sudo: True
+# - name: restart iptables
+#   service: name=iptables state=restarted
+#   sudo: True
+
+#  don't start anything
+- name: Start Tomcat
+  service: name={{tomcat_instance.name}} state=started enabled=yes
+
