@@ -4,3 +4,6 @@
 
 - name: Install Java 1.8
   command: rpm -ivh /opt/jdk-8u141-linux-x64.rpm creates=/usr/bin/java
+
+- name: Install unzip
+  yum: name=unzip state=present validate_certs=yes
